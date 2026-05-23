@@ -12,6 +12,8 @@ dist
 dist-ssr
 dev-dist
 dev-dist-ssr
+dev-dist.bak-*
+dist.legacy-bak-*
 *.local
 .pnpm-store
 .pnpm

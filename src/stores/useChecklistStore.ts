@@ -109,7 +109,7 @@ export default function useChecklistStore() {
       toast({
         variant: 'destructive',
         title: 'Erro',
-        description: 'Falha ao salvar marcação. Tente novamente.',
+        description: 'Falha ao apagar marcações. Tente novamente.',
       })
     }
   }, [])

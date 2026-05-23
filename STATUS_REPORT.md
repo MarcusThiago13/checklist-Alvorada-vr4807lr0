@@ -1,19 +1,18 @@
-# Status Report (Alignment) - Cleanup & Etapa 1
+# Status Report (Alignment) - Finalization
 
-## Arquivos Criados/Modificados Adiantados (Escopo da Etapa 2)
+## Resumo das Atualizações
 
-- `src/pages/Login.tsx`: Interface de Login construída e integrada com hook de autenticação antecipadamente.
-- `src/hooks/use-auth.tsx`: Hook de controle de estado e integração da autenticação com o PocketBase (inferido).
-- `pocketbase/migrations/0003_create_checklist_state.js` & `0004`: Tabelas adicionais para estado e segurança.
-- `pocketbase/migrations/0005_*` ao `0008_*`: Seeds históricos que serviram para testes locais iniciais, agora sanitizados de acordo com as diretrizes de segurança.
+O projeto foi finalizado integrando as seguintes funcionalidades:
 
-## Status de Conexão (App.tsx)
+- **Autenticação**: Foi implementada a proteção de rotas (`ProtectedRoute`) e o uso global do `AuthProvider`. A aplicação inteira agora requer que o usuário realize o login para ter acesso ao dashboard. Adicionado também o controle de logout na tela inicial.
+- **Remoção de Visitantes**: Toda lógica de convidados (Guest Access) e IDs simulados foi removida.
+- **Aderência de Dados**: Textos do painel e rodapé atualizados, especificando exclusividade ao Edital 189/2026 e restrição para uso apenas da "OSC Hello Kids". O arquivo de dados da checklist permaneceu inalterado.
+- **Feedback ao Usuário**: Integrado o sistema de toasts para feedback de erros na comunicação com o PocketBase.
+- **Limpeza**: Removidos componentes desnecessários, cópias do store `useChecklistStore`, e métodos sem uso no `use-auth.tsx`.
 
-- O arquivo `src/pages/Login.tsx` encontra-se atualmente **ISOLADO** do roteamento.
-- Não há definição da rota `/login` no `App.tsx` neste momento.
-- A aplicação permanece aberta como visitante (Guest Access). O componente principal `Index` é carregado sem impedimentos ou guardas de roteamento (Auth Guards).
+## Gestão de Usuários e Acesso
 
-## Funcionalidade Parcial Implementada (Avanços)
+**Atenção:** Como não deve haver scripts automáticos ou lógicas expostas ("seeds") para popular usuários visando evitar vulnerabilidades ou sobrescritas de ambiente:
 
-- **UI & SDK:** O formulário de Login já consome corretamente o `signIn` e executa tratamento de erros com feedback visual.
-- **Pendências para Etapa 2:** O aplicativo está preparado estruturalmente, restando apenas adicionar o `AuthProvider` encapsulando as rotas no `App.tsx`, configurar o roteamento (ex: `/login`) e implementar o componente `ProtectedRoute` para proteger o Dashboard (`Index`) quando a obrigatoriedade for definida.
+1. O acesso é estritamente **monousuário** e de uso fechado pela OSC.
+2. O usuário da Hello Kids deve ser criado e gerenciado **manualmente** na coleção `users` do painel administrativo do PocketBase.

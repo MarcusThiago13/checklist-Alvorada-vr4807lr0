@@ -7,7 +7,6 @@ interface AuthContextType {
   signIn: (identifier: string, password: string) => Promise<{ error: any }>
   signOut: () => void
   loading: boolean
-  acceptPrivacy: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -102,17 +101,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('last_active')
   }
 
-  const acceptPrivacy = async () => {
-    if (user) {
-      const updated = await pb.collection('users').update(user.id, { privacy_accepted: true })
-      setUser(updated)
-    }
-  }
-
   return (
-    <AuthContext.Provider
-      value={{ user, isAuthenticated, signIn, signOut, loading, acceptPrivacy }}
-    >
+    <AuthContext.Provider value={{ user, isAuthenticated, signIn, signOut, loading }}>
       {children}
     </AuthContext.Provider>
   )

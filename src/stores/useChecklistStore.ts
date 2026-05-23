@@ -1,38 +1,17 @@
 import { useState, useCallback, useRef } from 'react'
 import pb from '@/lib/pocketbase/client'
 import { Status, ItemState } from '@/lib/checklist-data'
+import { toast } from '@/hooks/use-toast'
 
 export default function useChecklistStore() {
   const [items, setItems] = useState<Record<string, ItemState>>({})
   const debounceTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
-  const initializeGuest = async () => {
-    if (pb.authStore.isValid) return
-    try {
-      const randomId = Math.random().toString(36).slice(2, 10)
-      const email = `guest_${randomId}@guest.local`
-      const password = `Guest${randomId}1!`
-      await pb.collection('users').create({
-        email,
-        password,
-        passwordConfirm: password,
-        privacy_accepted: true,
-      })
-      await pb.collection('users').authWithPassword(email, password)
-    } catch (e) {
-      console.error('Guest login failed', e)
-    }
-  }
-
   const loadItems = useCallback(async () => {
-    await initializeGuest()
+    if (!pb.authStore.isValid || !pb.authStore.record?.id) return
 
     try {
-      let filter = `user_id = ""`
-      if (pb.authStore.isValid) {
-        filter = `user_id = "${pb.authStore.record?.id}"`
-      }
-
+      const filter = `user_id = "${pb.authStore.record.id}"`
       const records = await pb.collection('checklist_state').getFullList({ filter })
 
       const newItems: Record<string, ItemState> = {}
@@ -47,7 +26,11 @@ export default function useChecklistStore() {
       }
       setItems(newItems)
     } catch (e) {
-      console.error('Failed to load items', e)
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Falha ao carregar dados.',
+      })
     }
   }, [])
 
@@ -67,8 +50,9 @@ export default function useChecklistStore() {
       }
 
       debounceTimers.current[itemId] = setTimeout(async () => {
+        if (!pb.authStore.isValid) return
+
         try {
-          await initializeGuest()
           const payload = {
             item_id: itemId,
             status: updated.status,
@@ -86,7 +70,11 @@ export default function useChecklistStore() {
             [itemId]: { ...s[itemId], id: res.id },
           }))
         } catch (e) {
-          console.error('Failed to save item', e)
+          toast({
+            variant: 'destructive',
+            title: 'Erro',
+            description: 'Falha ao salvar marcação. Tente novamente.',
+          })
         }
       }, 1000)
 
@@ -111,13 +99,18 @@ export default function useChecklistStore() {
 
     setItems({})
 
+    if (!pb.authStore.isValid) return
+
     try {
-      await initializeGuest()
       await pb.send('/backend/v1/checklist-state/reset', {
         method: 'POST',
       })
     } catch (e) {
-      console.error('Failed to reset items', e)
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Falha ao salvar marcação. Tente novamente.',
+      })
     }
   }, [])
 

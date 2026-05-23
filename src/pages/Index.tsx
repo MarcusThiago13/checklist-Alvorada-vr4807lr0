@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/use-auth'
 import useChecklistStore from '@/stores/useChecklistStore'
 import { categorias, cronograma, TARGET_DATE, HOJE } from '@/lib/checklist-data'
 import { cn } from '@/lib/utils'
@@ -31,6 +33,8 @@ function statusLabel(s: string) {
 }
 
 export default function Index() {
+  const { signOut } = useAuth()
+  const navigate = useNavigate()
   const { items, loadItems, updateItem, resetAll } = useChecklistStore()
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({})
@@ -154,9 +158,23 @@ export default function Index() {
   return (
     <div className="app-page">
       <div className="app-header">
-        <div className="app-brand">Painel de Compliance</div>
-        <div className="app-title">Painel de Controle da OSC</div>
-        <div className="app-subtitle">Chamamento Público · Apoio à Educação Inclusiva</div>
+        <div className="flex justify-between items-start gap-4">
+          <div>
+            <div className="app-brand">Painel de Compliance</div>
+            <div className="app-title">Painel de Controle da OSC</div>
+            <div className="app-subtitle">Chamamento Público · Apoio à Educação Inclusiva</div>
+          </div>
+          <button
+            className="app-btn secondary"
+            style={{ padding: '6px 12px', fontSize: '13px' }}
+            onClick={() => {
+              signOut()
+              navigate('/login')
+            }}
+          >
+            Sair
+          </button>
+        </div>
         <div className="app-header-meta">{timeStr}</div>
         <div className="app-progress-wrap">
           <div className="app-progress-bar" style={{ width: `${prog.pct}%` }}></div>
@@ -198,10 +216,8 @@ export default function Index() {
         <strong>Como este painel está organizado.</strong>
         <ul>
           <li>
-            O painel é genérico — utilizável por qualquer OSC interessada em participar do
-            Chamamento Público — e segue a sequência prática do trabalho: 1) cronograma · 2) janela
-            de impugnação · 3) logística do protocolo · 4) documentos do envelope · 5) pós-seleção e
-            celebração.
+            O painel segue a sequência prática do trabalho: 1) cronograma · 2) janela de impugnação
+            · 3) logística do protocolo · 4) documentos do envelope · 5) pós-seleção e celebração.
           </li>
           <li>
             Cada seção tem um cabeçalho clicável: <strong>clique nele para abrir ali mesmo</strong>{' '}
@@ -493,9 +509,8 @@ export default function Index() {
       </div>
 
       <div className="app-footer-note">
-        Painel genérico de compliance · Conteúdo aderente ao texto do Edital · Dados persistidos
-        localmente e em nuvem · Versão 5.0 — checklist genérico para qualquer OSC, com aderência
-        estrita ao Edital
+        Painel produzido pela MTH Compliance · Conteúdo aderente ao texto do Edital nº 189/2026 ·
+        Uso restrito da OSC Hello Kids — link e dados não compartilhados com terceiros.
       </div>
 
       <button

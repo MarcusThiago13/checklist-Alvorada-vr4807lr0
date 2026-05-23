@@ -90,7 +90,7 @@ export default function Index() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'checklist_osc_189_2026.json'
+    a.download = 'checklist_export.json'
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -116,7 +116,7 @@ export default function Index() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'checklist_osc_189_2026.csv'
+    a.download = 'checklist_export.csv'
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -154,11 +154,9 @@ export default function Index() {
   return (
     <div className="app-page">
       <div className="app-header">
-        <div className="app-brand">MTH Compliance — Marcus Thiago, OAB/RS</div>
+        <div className="app-brand">Painel de Compliance</div>
         <div className="app-title">Painel de Controle da OSC</div>
-        <div className="app-subtitle">
-          Chamamento Público nº 189/2026 — Município de Alvorada/RS · Apoio à Educação Inclusiva
-        </div>
+        <div className="app-subtitle">Chamamento Público · Apoio à Educação Inclusiva</div>
         <div className="app-header-meta">{timeStr}</div>
         <div className="app-progress-wrap">
           <div className="app-progress-bar" style={{ width: `${prog.pct}%` }}></div>
@@ -201,9 +199,9 @@ export default function Index() {
         <ul>
           <li>
             O painel é genérico — utilizável por qualquer OSC interessada em participar do
-            Chamamento Público nº 189/2026 — e segue a sequência prática do trabalho: 1) cronograma
-            · 2) janela de impugnação · 3) logística do protocolo · 4) documentos do envelope · 5)
-            pós-seleção e celebração.
+            Chamamento Público — e segue a sequência prática do trabalho: 1) cronograma · 2) janela
+            de impugnação · 3) logística do protocolo · 4) documentos do envelope · 5) pós-seleção e
+            celebração.
           </li>
           <li>
             Cada seção tem um cabeçalho clicável: <strong>clique nele para abrir ali mesmo</strong>{' '}
@@ -495,10 +493,9 @@ export default function Index() {
       </div>
 
       <div className="app-footer-note">
-        Painel produzido pela MTH Compliance · Conteúdo aderente ao texto do Edital nº 189/2026 ·
-        Disciplina antifabricação do ecossistema MTH · Dados persistidos localmente e em nuvem ·
-        Versão 5.0 — checklist genérico para qualquer OSC, com aderência estrita ao Edital nº
-        189/2026 (22/05/2026)
+        Painel genérico de compliance · Conteúdo aderente ao texto do Edital · Dados persistidos
+        localmente e em nuvem · Versão 5.0 — checklist genérico para qualquer OSC, com aderência
+        estrita ao Edital
       </div>
 
       <button

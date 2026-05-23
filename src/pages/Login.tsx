@@ -50,7 +50,7 @@ export default function Login() {
               </Alert>
             )}
             <div className="space-y-2">
-              <Label htmlFor="identifier">Identificador ou E-mail</Label>
+              <Label htmlFor="identifier">Usuário ou E-mail</Label>
               <Input
                 id="identifier"
                 type="text"

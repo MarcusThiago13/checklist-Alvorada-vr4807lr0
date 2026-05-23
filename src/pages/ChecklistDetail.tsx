@@ -25,6 +25,15 @@ export default function ChecklistDetail() {
   const [newTask, setNewTask] = useState('')
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all')
 
+  const filteredTasks = useMemo(() => {
+    if (!list) return []
+    return list.tasks.filter((t) => {
+      if (filter === 'active') return !t.completed
+      if (filter === 'completed') return t.completed
+      return true
+    })
+  }, [list?.tasks, filter])
+
   if (!list) {
     return (
       <div className="flex flex-col items-center justify-center py-20 animate-fade-in">
@@ -50,14 +59,6 @@ export default function ChecklistDetail() {
       setNewTask('')
     }
   }
-
-  const filteredTasks = useMemo(() => {
-    return list.tasks.filter((t) => {
-      if (filter === 'active') return !t.completed
-      if (filter === 'completed') return t.completed
-      return true
-    })
-  }, [list.tasks, filter])
 
   const priorityColors = {
     low: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-400',

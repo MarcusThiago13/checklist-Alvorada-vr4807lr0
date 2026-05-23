@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { useAuth } from '@/hooks/use-auth'
 import useChecklistStore from '@/stores/useChecklistStore'
 import { categorias, cronograma, TARGET_DATE, HOJE } from '@/lib/checklist-data'
 import { cn } from '@/lib/utils'
@@ -32,7 +31,6 @@ function statusLabel(s: string) {
 }
 
 export default function Index() {
-  const { user, acceptPrivacy } = useAuth()
   const { items, loadItems, updateItem, resetAll } = useChecklistStore()
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({})
@@ -152,26 +150,6 @@ export default function Index() {
   }, [])
 
   const limiteDias = daysDiff(TARGET_DATE)
-
-  if (!user?.privacy_accepted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--app-bg)]">
-        <div className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full border-t-4 border-t-primary">
-          <h2 className="text-xl font-bold mb-4">Política de Privacidade</h2>
-          <p className="text-sm text-gray-600 mb-6">
-            Ao utilizar o Painel de Controle da OSC, você concorda que as informações inseridas
-            nestes formulários são de responsabilidade exclusiva da sua organização. O sistema
-            armazena os dados de controle para acompanhamento interno do certame e não coleta
-            informações pessoais sensíveis além das estritamente necessárias para a operação da
-            conta. Os dados são persistidos na infraestrutura Skip Cloud associada a este ambiente.
-          </p>
-          <button onClick={acceptPrivacy} className="app-btn w-full">
-            Li e aceito a Política de Privacidade (v1.0)
-          </button>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="app-page">

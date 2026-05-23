@@ -6,13 +6,34 @@ export default function useChecklistStore() {
   const [items, setItems] = useState<Record<string, ItemState>>({})
   const debounceTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
+  const initializeGuest = async () => {
+    if (pb.authStore.isValid) return
+    try {
+      const randomId = Math.random().toString(36).slice(2, 10)
+      const email = `guest_${randomId}@guest.local`
+      const password = `Guest${randomId}1!`
+      await pb.collection('users').create({
+        email,
+        password,
+        passwordConfirm: password,
+        privacy_accepted: true,
+      })
+      await pb.collection('users').authWithPassword(email, password)
+    } catch (e) {
+      console.error('Guest login failed', e)
+    }
+  }
+
   const loadItems = useCallback(async () => {
-    if (!pb.authStore.isValid) return
+    await initializeGuest()
 
     try {
-      const records = await pb.collection('checklist_state').getFullList({
-        filter: `user_id = "${pb.authStore.record?.id}"`,
-      })
+      let filter = `user_id = ""`
+      if (pb.authStore.isValid) {
+        filter = `user_id = "${pb.authStore.record?.id}"`
+      }
+
+      const records = await pb.collection('checklist_state').getFullList({ filter })
 
       const newItems: Record<string, ItemState> = {}
       for (const rec of records) {
@@ -47,42 +68,27 @@ export default function useChecklistStore() {
 
       debounceTimers.current[itemId] = setTimeout(async () => {
         try {
-          const { id, ...saveData } = updated
+          await initializeGuest()
           const payload = {
-            ...saveData,
-            user_id: pb.authStore.record?.id,
+            item_id: itemId,
+            status: updated.status,
+            responsavel: updated.responsavel,
+            anotacao: updated.anotacao,
           }
 
-          if (id) {
-            await pb.collection('checklist_state').update(id, payload)
-          } else {
-            try {
-              const res = await pb.collection('checklist_state').create(payload)
-              setItems((s) => ({
-                ...s,
-                [itemId]: { ...s[itemId], id: res.id },
-              }))
-            } catch (err: any) {
-              try {
-                const existing = await pb
-                  .collection('checklist_state')
-                  .getFirstListItem(`user_id="${pb.authStore.record?.id}" && item_id="${itemId}"`)
-                if (existing) {
-                  await pb.collection('checklist_state').update(existing.id, payload)
-                  setItems((s) => ({
-                    ...s,
-                    [itemId]: { ...s[itemId], id: existing.id },
-                  }))
-                }
-              } catch {
-                /* intentionally ignored */
-              }
-            }
-          }
+          const res = await pb.send('/backend/v1/checklist-state', {
+            method: 'POST',
+            body: JSON.stringify(payload),
+          })
+
+          setItems((s) => ({
+            ...s,
+            [itemId]: { ...s[itemId], id: res.id },
+          }))
         } catch (e) {
           console.error('Failed to save item', e)
         }
-      }, 2000)
+      }, 1000)
 
       return {
         ...prev,
@@ -106,13 +112,10 @@ export default function useChecklistStore() {
     setItems({})
 
     try {
-      const records = await pb.collection('checklist_state').getFullList({
-        filter: `user_id = "${pb.authStore.record?.id}"`,
+      await initializeGuest()
+      await pb.send('/backend/v1/checklist-state/reset', {
+        method: 'POST',
       })
-
-      for (const r of records) {
-        await pb.collection('checklist_state').delete(r.id)
-      }
     } catch (e) {
       console.error('Failed to reset items', e)
     }

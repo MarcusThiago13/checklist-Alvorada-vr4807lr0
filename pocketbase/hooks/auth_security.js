@@ -1,6 +1,9 @@
 // Enforce password complexity rules on users collection
 onRecordCreateRequest((e) => {
-  const password = e.requestInfo().body.password
+  if (!e.requestInfo) return e.next()
+
+  const body = e.requestInfo().body || {}
+  const password = body.password
 
   if (!password) {
     throw new BadRequestError('Password is required.', {
@@ -29,7 +32,10 @@ onRecordCreateRequest((e) => {
 }, 'users')
 
 onRecordUpdateRequest((e) => {
-  const password = e.requestInfo().body.password
+  if (!e.requestInfo) return e.next()
+
+  const body = e.requestInfo().body || {}
+  const password = body.password
 
   if (password) {
     if (password.length < 10) {

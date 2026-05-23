@@ -14,6 +14,8 @@ migrate(
     record.setPassword('EditalAlvorada1892026')
     record.setVerified(true)
     record.set('name', 'HelloKids')
+
+    // Hooks that expect a request context must guard against internal saves
     app.save(record)
   },
   (app) => {

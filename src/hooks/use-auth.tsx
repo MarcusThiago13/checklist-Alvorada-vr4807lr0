@@ -4,7 +4,7 @@ import pb from '@/lib/pocketbase/client'
 interface AuthContextType {
   user: any
   isAuthenticated: boolean
-  signIn: (email: string, password: string) => Promise<{ error: any }>
+  signIn: (identifier: string, password: string) => Promise<{ error: any }>
   signOut: () => void
   loading: boolean
   acceptPrivacy: () => Promise<void>
@@ -60,24 +60,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (identifier: string, password: string) => {
     try {
       // Check lockout first
       const checkRes = await pb.send('/backend/v1/auth/check-lockout', {
         method: 'POST',
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ identifier }),
       })
 
       if (checkRes.locked) {
         return { error: { message: 'Account locked. Try again later.' } }
       }
 
-      await pb.collection('users').authWithPassword(email, password)
+      await pb.collection('users').authWithPassword(identifier, password)
 
       // Reset lockout on success
       await pb.send('/backend/v1/auth/reset-lockout', {
         method: 'POST',
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ identifier }),
       })
 
       localStorage.setItem('last_active', new Date().getTime().toString())
@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         await pb.send('/backend/v1/auth/report-fail', {
           method: 'POST',
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ identifier }),
         })
       } catch {
         /* intentionally ignored */

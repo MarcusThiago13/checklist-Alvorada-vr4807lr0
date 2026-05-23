@@ -11,7 +11,7 @@ import { getErrorMessage } from '@/lib/pocketbase/errors'
 export default function Login() {
   const { signIn } = useAuth()
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -21,7 +21,7 @@ export default function Login() {
     setError('')
     setLoading(true)
 
-    const result = await signIn(email, password)
+    const result = await signIn(identifier, password)
 
     if (result.error) {
       setError(getErrorMessage(result.error))
@@ -50,14 +50,14 @@ export default function Login() {
               </Alert>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">E-mail corporativo</Label>
+              <Label htmlFor="identifier">Identificador ou E-mail</Label>
               <Input
-                id="email"
-                type="email"
+                id="identifier"
+                type="text"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="nome@osc.org.br"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="HelloKids ou email"
               />
             </div>
             <div className="space-y-2">

@@ -62,11 +62,11 @@ onRecordUpdateRequest((e) => {
 // Custom routes to handle login lockouts
 routerAdd('POST', '/backend/v1/auth/check-lockout', (e) => {
   const body = e.requestInfo().body
-  const email = body.email
-  if (!email) return e.json(200, { locked: false })
+  const identifier = body.identifier || body.email
+  if (!identifier) return e.json(200, { locked: false })
 
   try {
-    const record = $app.findFirstRecordByData('login_attempts', 'email', email)
+    const record = $app.findFirstRecordByData('login_attempts', 'email', identifier)
     const lockedUntil = record.getString('locked_until')
     if (lockedUntil) {
       const lockDate = new Date(lockedUntil)
@@ -89,16 +89,16 @@ routerAdd('POST', '/backend/v1/auth/check-lockout', (e) => {
 
 routerAdd('POST', '/backend/v1/auth/report-fail', (e) => {
   const body = e.requestInfo().body
-  const email = body.email
-  if (!email) return e.json(200, { ok: true })
+  const identifier = body.identifier || body.email
+  if (!identifier) return e.json(200, { ok: true })
 
   const col = $app.findCollectionByNameOrId('login_attempts')
   let record
   try {
-    record = $app.findFirstRecordByData('login_attempts', 'email', email)
+    record = $app.findFirstRecordByData('login_attempts', 'email', identifier)
   } catch (_) {
     record = new Record(col)
-    record.set('email', email)
+    record.set('email', identifier)
     record.set('attempts', 0)
   }
 
@@ -128,11 +128,11 @@ routerAdd('POST', '/backend/v1/auth/report-fail', (e) => {
 
 routerAdd('POST', '/backend/v1/auth/reset-lockout', (e) => {
   const body = e.requestInfo().body
-  const email = body.email
-  if (!email) return e.json(200, { ok: true })
+  const identifier = body.identifier || body.email
+  if (!identifier) return e.json(200, { ok: true })
 
   try {
-    const record = $app.findFirstRecordByData('login_attempts', 'email', email)
+    const record = $app.findFirstRecordByData('login_attempts', 'email', identifier)
     record.set('attempts', 0)
     record.set('locked_until', '')
     $app.save(record)

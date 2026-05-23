@@ -1,13 +1,35 @@
 // Enforce password complexity rules on users collection
-onRecordValidate((e) => {
-  const isNew = !e.record.id
+onRecordCreateRequest((e) => {
   const password = e.requestInfo().body.password
 
-  if (isNew && !password) {
+  if (!password) {
     throw new BadRequestError('Password is required.', {
       password: new ValidationError('validation_required', 'Password is required.'),
     })
   }
+
+  if (password.length < 10) {
+    throw new BadRequestError('Password must be at least 10 characters long.', {
+      password: new ValidationError(
+        'validation_invalid',
+        'Password must be at least 10 characters long.',
+      ),
+    })
+  }
+  if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+    throw new BadRequestError('Password must contain at least one letter and one number.', {
+      password: new ValidationError(
+        'validation_invalid',
+        'Password must contain at least one letter and one number.',
+      ),
+    })
+  }
+
+  e.next()
+}, 'users')
+
+onRecordUpdateRequest((e) => {
+  const password = e.requestInfo().body.password
 
   if (password) {
     if (password.length < 10) {

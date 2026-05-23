@@ -2,6 +2,7 @@ migrate(
   (app) => {
     const users = app.findCollectionByNameOrId('_pb_users_auth_')
 
+    // Prevent duplicate seeding
     try {
       app.findAuthRecordByEmail('_pb_users_auth_', 'hellokids@example.com')
       return // already seeded

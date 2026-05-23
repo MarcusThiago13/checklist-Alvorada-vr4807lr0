@@ -74,11 +74,22 @@ routerAdd('POST', '/backend/v1/auth/report-fail', (e) => {
     record.set('attempts', 0)
   }
 
+  const now = new Date()
+
+  const updatedStr = record.getString('updated')
+  if (updatedStr) {
+    const updated = new Date(updatedStr.replace(' ', 'T'))
+    const diffMins = (now.getTime() - updated.getTime()) / (1000 * 60)
+    if (diffMins > 15) {
+      record.set('attempts', 0)
+    }
+  }
+
   let attempts = record.getInt('attempts') + 1
   record.set('attempts', attempts)
 
   if (attempts >= 5) {
-    const lockTime = new Date()
+    const lockTime = new Date(now)
     lockTime.setMinutes(lockTime.getMinutes() + 30)
     record.set('locked_until', lockTime.toISOString())
   }

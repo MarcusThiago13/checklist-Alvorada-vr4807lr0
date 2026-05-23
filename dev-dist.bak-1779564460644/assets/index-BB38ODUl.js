@@ -35565,7 +35565,8 @@ var AuthProvider = ({ children }) => {
     children,
   })
 }
-/* @__PURE__ */ ;(new Date().toISOString(), /* @__PURE__ */ new Date().toISOString())
+/* @__PURE__ */
+;(new Date().toISOString(), /* @__PURE__ */ new Date().toISOString())
 var ChecklistContext = (0, import_react.createContext)(void 0)
 function useChecklistStore() {
   const context = (0, import_react.useContext)(ChecklistContext)

@@ -26,7 +26,7 @@ export default function Login() {
     const result = await signIn(identifier, password)
 
     if (result.error) {
-      setError(getErrorMessage(result.error))
+      setError('Failed to authenticate.')
     } else {
       navigate('/')
     }

@@ -59,7 +59,7 @@ export default function Login() {
                 required
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="HelloKids ou email"
+                placeholder="seu e-mail ou usuário"
               />
             </div>
             <div className="space-y-2">

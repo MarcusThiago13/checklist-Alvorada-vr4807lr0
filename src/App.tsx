@@ -1,33 +1,37 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
-import { Toaster as Sonner } from '@/components/ui/sonner'
-import { TooltipProvider } from '@/components/ui/tooltip'
-import { ChecklistProvider } from '@/stores/useChecklistStore'
+import { AuthProvider, useAuth } from '@/hooks/use-auth'
 import Index from './pages/Index'
-import ChecklistDetail from './pages/ChecklistDetail'
+import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 import Layout from './components/Layout'
 
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, loading } = useAuth()
+  if (loading) return null
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
 const App = () => (
-  <BrowserRouter future={{ v7_startTransition: false, v7_relativeSplatPath: false }}>
-    <ChecklistProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/checklist/:id" element={<ChecklistDetail />} />
-            <Route path="/starred" element={<Index />} />
-            <Route path="/completed" element={<Index />} />
-            <Route path="/trash" element={<Index />} />
-            <Route path="/category/:name" element={<Index />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </TooltipProvider>
-    </ChecklistProvider>
-  </BrowserRouter>
+  <AuthProvider>
+    <BrowserRouter future={{ v7_startTransition: false, v7_relativeSplatPath: false }}>
+      <Toaster />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/" element={<Index />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  </AuthProvider>
 )
 
 export default App
